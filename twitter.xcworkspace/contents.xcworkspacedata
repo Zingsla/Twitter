@@ -2,9 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/franzj/Desktop/Twitter/Twitter.xcodeproj">
+      location = "group:/Users/franzj/Desktop/Twitter/twitter.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:twitter.xcodeproj">
    </FileRef>
 </Workspace>

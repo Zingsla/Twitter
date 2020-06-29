@@ -8,8 +8,12 @@
 
 #import "TimelineViewController.h"
 #import "APIManager.h"
+#import "TweetCell.h"
 
-@interface TimelineViewController ()
+@interface TimelineViewController () <UITableViewDataSource, UITableViewDelegate>
+
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (strong, nonatomic) NSMutableArray *tweets;
 
 @end
 
@@ -18,18 +22,40 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.tableView.dataSource = self;
+    self.tableView.delegate = self;
+    
+    [self fetchTweets];
+}
+
+- (void)fetchTweets {
     // Get timeline
-    [[APIManager shared] getHomeTimelineWithCompletion:^(NSArray *tweets, NSError *error) {
-        if (tweets) {
-            NSLog(@"😎😎😎 Successfully loaded home timeline");
-            for (NSDictionary *dictionary in tweets) {
-                NSString *text = dictionary[@"text"];
-                NSLog(@"%@", text);
-            }
-        } else {
-            NSLog(@"😫😫😫 Error getting home timeline: %@", error.localizedDescription);
-        }
-    }];
+       [[APIManager shared] getHomeTimelineWithCompletion:^(NSMutableArray *tweets, NSError *error) {
+           if (tweets) {
+               NSLog(@"Successfully loaded home timeline");
+               self.tweets = tweets;
+               
+               [self.tableView reloadData];
+           } else {
+               NSLog(@"Error getting home timeline: %@", error.localizedDescription);
+           }
+       }];
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return self.tweets.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    TweetCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TweetCell"];
+    Tweet *tweet = self.tweets[indexPath.row];
+    
+    cell.nameLabel.text = tweet.user.name;
+    cell.usernameLabel.text = tweet.user.screenName;
+    cell.dateLabel.text = tweet.createdAtString;
+    cell.tweetLabel.text = tweet.text;
+    
+    return cell;
 }
 
 - (void)didReceiveMemoryWarning {
