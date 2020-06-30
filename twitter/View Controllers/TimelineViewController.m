@@ -15,6 +15,7 @@
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) NSMutableArray *tweets;
+@property (strong, nonatomic) UIRefreshControl *refreshControl;
 
 @end
 
@@ -25,6 +26,10 @@
     
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
+    
+    self.refreshControl = [[UIRefreshControl alloc] init];
+    [self.refreshControl addTarget:self action:@selector(fetchTweets) forControlEvents:UIControlEventValueChanged];
+    [self.tableView insertSubview:self.refreshControl atIndex:0];
     
     [self fetchTweets];
 }
@@ -41,6 +46,8 @@
                NSLog(@"Error getting home timeline: %@", error.localizedDescription);
            }
        }];
+    
+    [self.refreshControl endRefreshing];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
