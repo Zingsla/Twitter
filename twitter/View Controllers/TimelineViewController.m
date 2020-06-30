@@ -8,10 +8,11 @@
 
 #import "TimelineViewController.h"
 #import "APIManager.h"
+#import "ComposeViewController.h"
 #import "TweetCell.h"
 #import "UIImageView+AFNetworking.h"
 
-@interface TimelineViewController () <UITableViewDataSource, UITableViewDelegate>
+@interface TimelineViewController () <ComposeViewControllerDelegate, UITableViewDataSource, UITableViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) NSMutableArray *tweets;
@@ -56,20 +57,25 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     TweetCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TweetCell"];
-    Tweet *tweet = self.tweets[indexPath.row];
+    cell.tweet = self.tweets[indexPath.row];
     
-    cell.nameLabel.text = tweet.user.name;
-    cell.usernameLabel.text = [NSString stringWithFormat:@"@%@", tweet.user.screenName];
-    cell.dateLabel.text = tweet.createdAtString;
-    cell.tweetLabel.text = tweet.text;
-    cell.retweetCountLabel.text = [NSString stringWithFormat:@"%d", tweet.retweetCount];
-    cell.favoriteCountLabel.text = [NSString stringWithFormat:@"%d", tweet.favoriteCount];
+    cell.nameLabel.text = cell.tweet.user.name;
+    cell.usernameLabel.text = [NSString stringWithFormat:@"@%@", cell.tweet.user.screenName];
+    cell.dateLabel.text = cell.tweet.createdAtString;
+    cell.tweetLabel.text = cell.tweet.text;
+    cell.retweetCountLabel.text = [NSString stringWithFormat:@"%d", cell.tweet.retweetCount];
+    cell.favoriteCountLabel.text = [NSString stringWithFormat:@"%d", cell.tweet.favoriteCount];
     
-    NSString *profileImageURLString = [tweet.user.profileURLString stringByReplacingOccurrencesOfString:@"_normal" withString:@""];
+    NSString *profileImageURLString = [cell.tweet.user.profileURLString stringByReplacingOccurrencesOfString:@"_normal" withString:@""];
     NSURL *profileImageURL = [NSURL URLWithString:profileImageURLString];
     [cell.profileImageView setImageWithURL:profileImageURL];
     
     return cell;
+}
+
+- (void)didTweet:(Tweet *)tweet {
+    [self.tweets insertObject:tweet atIndex:0];
+    [self.tableView reloadData];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -77,15 +83,15 @@
     // Dispose of any resources that can be recreated.
 }
 
-/*
+
 #pragma mark - Navigation
 
-// In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+    UINavigationController *navigationController = [segue destinationViewController];
+    ComposeViewController *composeController = (ComposeViewController *)navigationController.topViewController;
+    composeController.delegate = self;
 }
-*/
+
 
 
 @end
