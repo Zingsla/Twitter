@@ -9,6 +9,7 @@
 #import "TimelineViewController.h"
 #import "APIManager.h"
 #import "TweetCell.h"
+#import "UIImageView+AFNetworking.h"
 
 @interface TimelineViewController () <UITableViewDataSource, UITableViewDelegate>
 
@@ -51,9 +52,15 @@
     Tweet *tweet = self.tweets[indexPath.row];
     
     cell.nameLabel.text = tweet.user.name;
-    cell.usernameLabel.text = tweet.user.screenName;
+    cell.usernameLabel.text = [NSString stringWithFormat:@"@%@", tweet.user.screenName];
     cell.dateLabel.text = tweet.createdAtString;
     cell.tweetLabel.text = tweet.text;
+    cell.retweetCountLabel.text = [NSString stringWithFormat:@"%d", tweet.retweetCount];
+    cell.favoriteCountLabel.text = [NSString stringWithFormat:@"%d", tweet.favoriteCount];
+    
+    NSString *profileImageURLString = [tweet.user.profileURLString stringByReplacingOccurrencesOfString:@"_normal" withString:@""];
+    NSURL *profileImageURL = [NSURL URLWithString:profileImageURLString];
+    [cell.profileImageView setImageWithURL:profileImageURL];
     
     return cell;
 }
